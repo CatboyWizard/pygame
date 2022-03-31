@@ -1,14 +1,8 @@
 #Imports
-from cProfile import run
-from json import load
-from re import X
-import sys
-from webbrowser import BackgroundBrowser
 import pygame
-from turtle import Screen, width
+from pygame import platform
 
-#Import pygame.locals for easier access to key coordinates
-#Updated to conform to flake8 and black standards
+#Import from pygame.locals
 from pygame.locals import(
     K_UP,
     K_DOWN,
@@ -22,49 +16,25 @@ from pygame.locals import(
     K_SPACE,
     )
 
-#Initialize pygame
-pygame.init()
+def ground(lvl,x,y,w,h):
+    ground_list = pygame.sprite.Group()
+    if lvl == 1:
+        ground = Platform(x,y,w,h,'block-ground.png')
+        ground_list.add(ground)
 
-#Define constants fpr the screen width and height
-WIDTH = 800
-Height = 400
-fps = 60
-clock =pygame.time.Clock()
+    if lvl == 2:
+        print("Level " + str(lvl) )
 
-#display/mosue
-display = pygame.display.set_mode((WIDTH, Height))
+    return ground_list
 
-pygame.mouse.set_visible(0)
-
-Background = BackgroundBrowser
-
-ground = (900, 120, -20, 320, "white-background-2.png")
-
-player = (200,200)
-
-Group1 = pygame.sprite.Group()
-Group1.add(ground)
-
-# !main code
-while True:
-
-    for event in pygame.event.get():
-        
-        if event.type == QUIT:
-            pygame.quit()
-
-        if event.type == MOUSEBUTTONDOWN:
-            pass
-        
-        if event.type == KEYDOWN:
-            if event.key == K_SPACE:
-                player.jump()
-
-    player.update(Group1)
-
-    display.blite(Background, (0,0))
-    ground.render(display)
-    player.render(display)
-
-    pygame.display.update()
-    clock.tick(fps)
+def platform( lvl ):
+    plat_list = pygame.sprite.Group()
+    if lvl == 1:
+        plat = Platform(200, worldy-97-128, 285,67,'block-big.png')
+        plat_list.add(plat)
+        plat = Platform(500, worldy-97-320, 197,54,'block-small.png')
+        plat_list.add(plat)
+    if lvl == 2:
+        print("Level " + str(lvl) )
+       
+    return plat_list
