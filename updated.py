@@ -6,12 +6,12 @@ import os
 '''
 Variables
 '''
-
 worldx = 960
 worldy = 720
 fps = 40
 ani = 4
 world = pygame.display.set_mode([worldx, worldy])
+DISPLAYSURF = pygame.display.set_mode((1920, 1010))
 
 BLUE = (25, 25, 200)
 BLACK = (23, 23, 23)
@@ -126,7 +126,7 @@ class Level:
         i = 0
         if lvl == 1:
             while i < len(gloc):
-                ground = Platform(gloc[i], worldy - ty, tx, ty, 'tile-ground.png')
+                ground = Platform(gloc[i], worldy - ty, tx, ty, 'C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\drawing.svg')
                 ground_list.add(ground)
                 i = i + 1
 
@@ -137,10 +137,10 @@ class Level:
 
     def bad(lvl, eloc):
         if lvl == 1:
-            enemy = Enemy(eloc[0], eloc[1])
+            enemy = Enemy(eloc[0], eloc[1], 'C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\enemy.png')
             enemy_list = pygame.sprite.Group()
             enemy_list.add(enemy)
-        img = pygame.image.load('C:\Users\mchugh_kevin\Desktop\python4\pygame\images\enemy.png')
+        img = pygame.image.load('C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\enemy.png')
         img.convert_alpha()
         img.set_colorkey(ALPHA)
         if lvl == 2:
@@ -160,7 +160,7 @@ class Level:
             while i < len(ploc):
                 j = 0
                 while j <= ploc[i][2]:
-                    plat = Platform((ploc[i][0] + (j * tx)), ploc[i][1], tx, ty, 'tile.png')
+                    plat = Platform((ploc[i][0] + (j * tx)), ploc[i][1], tx, ty, 'C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\drawing.svg')
                     plat_list.add(plat)
                     j = j + 1
                 print('run' + str(i) + str(ploc[i]))
