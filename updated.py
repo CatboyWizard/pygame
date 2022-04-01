@@ -46,7 +46,7 @@ class Player(pygame.sprite.Sprite):
         self.health = 10
         self.images = []
         for i in range(1, 5):
-            img = pygame.image.load(os.path.join('images', 'hero' + str(i) + '.png')).convert()
+            img = pygame.image.load('C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\hero1.png')
             img.convert_alpha()
             img.set_colorkey(ALPHA)
             self.images.append(img)
@@ -137,9 +137,12 @@ class Level:
 
     def bad(lvl, eloc):
         if lvl == 1:
-            enemy = Enemy(eloc[0], eloc[1], 'enemy.png')
+            enemy = Enemy(eloc[0], eloc[1])
             enemy_list = pygame.sprite.Group()
             enemy_list.add(enemy)
+        img = pygame.image.load('C:\Users\mchugh_kevin\Desktop\python4\pygame\images\enemy.png')
+        img.convert_alpha()
+        img.set_colorkey(ALPHA)
         if lvl == 2:
             print("Level " + str(lvl))
 
@@ -173,7 +176,7 @@ class Level:
 Setup
 '''
 
-backdrop = pygame.image.load(os.path.join('images', 'drawing.svg'))
+backdrop = pygame.image.load('C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\drawing.svg')
 clock = pygame.time.Clock()
 pygame.init()
 backdropbox = world.get_rect()
