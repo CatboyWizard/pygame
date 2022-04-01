@@ -173,7 +173,7 @@ class Level:
 Setup
 '''
 
-backdrop = pygame.image.load(os.path.join('images', 'stage.png'))
+backdrop = pygame.image.load(os.path.join('images', 'drawing.svg'))
 clock = pygame.time.Clock()
 pygame.init()
 backdropbox = world.get_rect()
