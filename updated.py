@@ -2,6 +2,8 @@
 import pygame
 import sys
 import os
+import math
+from pygame.locals import *
 
 '''
 Variables
@@ -117,7 +119,7 @@ class Enemy(pygame.sprite.Sprite):
         else:
             self.counter = 0
 
-        self.counter += 1
+        self.counter += 4
 
 
 class Level:
@@ -173,10 +175,45 @@ class Level:
 
 
 '''
+Movement and add more enemies
+'''
+def moveEnemy(self):
+    enemy = ["enemies", "enemies_list"]
+    lists = ["all_sprites_list"]
+
+    Enemy.rect.x = player.rect.x
+    Enemy.rect.y = player.rect.y
+    lists[0].add(enemy[0])
+    enemy[1].add(enemy[0])
+
+class Enemy(object):
+    ...
+    def move_towards_player(self, player):
+        # Find direction vector (dx, dy) between enemy and player.
+        dx, dy = player.rect.x - self.rect.x, player.rect.y - self.rect.y
+        dist = math.hypot(dx, dy)
+        dx, dy = dx / dist, dy / dist  # Normalize.
+        # Move along this normalized vector towards the player at current speed.
+        self.rect.x += dx * self.speed
+        self.rect.y += dy * self.speed
+
+    # Same thing using only pygame utilities
+    def move_towards_player2(self, player):
+        # Find direction vector (dx, dy) between enemy and player.
+        dirvect = pygame.math.Vector2(player.rect.x - self.rect.x,
+                                      player.rect.y - self.rect.y)
+        dirvect.normalize()
+        # Move along this normalized vector towards the player at current speed.
+        dirvect.scale_to_length(self.speed)
+        self.rect.move_ip(dirvect)
+
+
+
+'''
 Setup
 '''
 
-backdrop = pygame.image.load('C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\drawing.svg')
+backdrop = pygame.image.load('C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\drawing3.png')
 clock = pygame.time.Clock()
 pygame.init()
 backdropbox = world.get_rect()
@@ -194,8 +231,8 @@ eloc = [300, 0]
 enemy_list = Level.bad(1, eloc)
 
 gloc = []
-tx = 64
-ty = 64
+tx = 60
+ty = 60
 
 i = 0
 while i <= (worldx / tx) + tx:
@@ -239,7 +276,7 @@ while main:
             if event.key == pygame.K_RIGHT or event.key == ord('d'):
                 player.control(-steps, 0)
 
-    world.blit(backdrop, backdropbox)
+    # world.blit(backdrop, backdropbox)
     player.update()
     player_list.draw(world)
     enemy_list.draw(world)
