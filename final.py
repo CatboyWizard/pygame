@@ -1,684 +1,262 @@
+from cgitb import text
+from distutils.file_util import move_file
+from shutil import move
+from time import sleep
 import pygame
 import sys
 import os
 import math
-from pygame.main.updated2 import Player
-from pygame.main.updated2 import Level
+import random
+from pygame.locals import *
+from pygame import mixer
+from pygame.image import load as getImage
 pygame.init()
 
 '''
 Variables
 '''
-worldx = 960
-worldy = 720
-fps = 40
-ani = 4
-world = pygame.display.set_mode([worldx, worldy])
-DISPLAYSURF = pygame.display.set_mode((1920, 1010))
 
-win = pygame.display.set_mode((500,480))
-pygame.display.set_caption("First Game")
+Screen = pygame.display.set_mode((1000, 680))
+dir_img = 'C:\\Users\\mchugh_kevin\\Desktop\\pygame\\images\\'
+pygame.display.set_caption("Game")
 
 BLUE = (25, 25, 200)
 BLACK = (23, 23, 23)
 WHITE = (254, 254, 254)
 ALPHA = (0, 255, 0)
-
-'''
-Objects
-'''
-
-#! x location, y location, img width, img height, img file
-class Platform(pygame.sprite.Sprite):
-    def __init__(self, xloc, yloc, imgw, imgh, img):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join('images', img)).convert()
-        self.image.convert_alpha()
-        self.image.set_colorkey(ALPHA)
-        self.rect = self.image.get_rect()
-        self.rect.y = yloc
-        self.rect.x = xloc
-
-class Player(pygame.sprite.Sprite):
-
-    """
-    Spawn a player
-    """
-
-class Platform(pygame.sprite.Sprite):
-    def __init__(self, xloc, yloc, imgw, imgh, img):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join('images', img)).convert()
-        self.image.convert_alpha()
-        self.image.set_colorkey(ALPHA)
-        self.rect = self.image.get_rect()
-        self.rect.y = yloc
-        self.rect.x = xloc
-
-class Player(pygame.sprite.Sprite):
-    """
-    Spawn a player
-    """
-
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.movex = 0
-        self.movey = 0
-        self.frame = 0
-        self.health = 10
-        self.images = []
-        for i in range(1, 5):
-            img = pygame.image.load('C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\hero1.png')
-            img.convert_alpha()
-            img.set_colorkey(ALPHA)
-            self.images.append(img)
-            self.image = self.images[0]
-            self.rect = self.image.get_rect()
-
-    def control(self, x, y):
-
-
-        """
-        control player movement
-        """
-        self.movex += x
-        self.movey += y
-
-    def update(self):
-
-
-        """
-        Update sprite position
-        """
-
-        self.rect.x = self.rect.x + self.movex
-        self.rect.y = self.rect.y + self.movey
-
-        #? moving left
-        if self.movex < 0:
-            self.frame += 1
-            if self.frame > 3 * ani:
-                self.frame = 0
-            self.image = pygame.transform.flip(self.images[self.frame // ani], True, False)
-
-        #* moving right
-        if self.movex > 0:
-            self.frame += 1
-            if self.frame > 3 * ani:
-                self.frame = 0
-            self.image = self.images[self.frame // ani]
-
-        hit_list = pygame.sprite.spritecollide(self, enemy_list, False)
-        for enemy in hit_list:
-            self.health -= 1
-            print(self.health)
-
-
-class Enemy(pygame.sprite.Sprite):
-
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.movex = 0
-        self.movey = 0
-        self.frame = 0
-        self.health = 10
-        self.images = []
-        for i in range(1, 5):
-            img = pygame.image.load(os.path.join('images', 'hero' + str(i) + '.png')).convert()
-            img.convert_alpha()
-            img.set_colorkey(ALPHA)
-            self.images.append(img)
-            self.image = self.images[0]
-            self.rect = self.image.get_rect()
-
-    def control(self, x, y):
-
-
-        """
-        control player movement
-        """
-
-
-        self.movex += x
-        self.movey += y
-
-    def update(self):
-
-
-        """
-        Update sprite position
-        """
-
-        self.rect.x = self.rect.x + self.movex
-        self.rect.y = self.rect.y + self.movey
-
-        # moving left
-        if self.movex < 0:
-            self.frame += 1
-            if self.frame > 3*ani:
-                self.frame = 0
-            self.image = pygame.transform.flip(self.images[self.frame // ani], True, False)
-
-        # moving right
-        if self.movex > 0:
-            self.frame += 1
-            if self.frame > 3*ani:
-                self.frame = 0
-            self.image = self.images[self.frame//ani]
-
-        hit_list = pygame.sprite.spritecollide(self, enemy_list, False)
-        for enemy in hit_list:
-            self.health -= 1
-            print(self.health)
-
-
-class Enemy(pygame.sprite.Sprite):
-    
-    
-    """
-    Spawn an enemy
-    """
-    
-    def __init__(self, x, y, img):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join('images', img))
-        self.image.convert_alpha()
-        self.image.set_colorkey(ALPHA)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.counter = 0
-
-    def move(self):
-        """
-        enemy movement
-        """
-        distance = 80
-        speed = 8
-
-        if self.counter >= 0 and self.counter <= distance:
-            self.rect.x += speed
-        elif self.counter >= distance and self.counter <= distance * 2:
-            self.rect.x -= speed
-        else:
-            self.counter = 0
-
-        self.counter += 4
-
-
-class Level:
-    def ground(lvl, gloc, tx, ty):
-        ground_list = pygame.sprite.Group()
-        i = 0
-        if lvl == 1:
-            while i < len(gloc):
-                ground = Platform(gloc[i], worldy - ty, tx, ty, 'C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\drawing.svg')
-                ground_list.add(ground)
-                i = i + 1
-
-        if lvl == 2:
-            print("Level " + str(lvl))
-
-        return ground_list
-
-    def bad(lvl, eloc):
-        if lvl == 1:
-            enemy = Enemy(eloc[0], eloc[1], 'C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\enemy.png')
-            enemy_list = pygame.sprite.Group()
-            enemy_list.add(enemy)
-        img = pygame.image.load('C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\enemy.png')
-        img.convert_alpha()
-        img.set_colorkey(ALPHA)
-        if lvl == 2:
-            print("Level " + str(lvl))
-
-        return enemy_list
-
-    #* x location, y location, img width, img height, img file
-    def platform(lvl, tx, ty):
-        plat_list = pygame.sprite.Group()
-        ploc = []
-        i = 0
-        if lvl == 1:
-            ploc.append((200, worldy - ty - 128, 3))
-            ploc.append((300, worldy - ty - 256, 3))
-            ploc.append((500, worldy - ty - 128, 4))
-            while i < len(ploc):
-                j = 0
-                while j <= ploc[i][2]:
-                    plat = Platform((ploc[i][0] + (j * tx)), ploc[i][1], tx, ty, 'C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\drawing3.jpg')
-                    plat_list.add(plat)
-                    j = j + 1
-                print('run' + str(i) + str(ploc[i]))
-                i = i + 1
-
-        if lvl == 2:
-            print("Level " + str(lvl))
-
-    def __init__(self, x, y, img):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join('images', img))
-        self.image.convert_alpha()
-        self.image.set_colorkey(ALPHA)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.counter = 0
-
-    def move(self):
-        """
-        enemy movement
-        """
-        distance = 80
-        speed = 8
-
-        if self.counter >= 0 and self.counter <= distance:
-            self.rect.x += speed
-        elif self.counter >= distance and self.counter <= distance*2:
-            self.rect.x -= speed
-        else:
-            self.counter = 0
-
-        self.counter += 1
-
-
-    def bad(lvl, eloc):
-        if lvl == 1:
-            enemy = Enemy(eloc[0], eloc[1], 'C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\enemy.png')
-            enemy_list = pygame.sprite.Group()
-            enemy_list.add(enemy)
-        img = pygame.image.load('C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\enemy.png')
-        img.convert_alpha()
-        img.set_colorkey(ALPHA)
-        if lvl == 2:
-            print("Level " + str(lvl))
-
-        return enemy_list
-        return plat_list
-
-'''
-Setup
-'''
-
-level = Level
-
-backdrop = pygame.image.load('C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\drawing3.jpg')
-clock = pygame.time.Clock()
-pygame.init()
-backdropbox = world.get_rect()
-main = True
-
-player = Player()  # spawn player
-player.rect.x = 0  # go to x
-player.rect.y = 30  # go to y
-player_list = pygame.sprite.Group()
-player_list.add(player)
-steps = 10
-
-eloc = []
-eloc = [300, 0]
-enemy_list = Level.bad(1, eloc)
-
-'''
-Walking
-'''
-walkRight = [pygame.image.load('R1.png'), pygame.image.load('R2.png'), pygame.image.load('R3.png'), pygame.image.load('R4.png'), pygame.image.load('R5.png'), pygame.image.load('R6.png'), pygame.image.load('R7.png'), pygame.image.load('R8.png'), pygame.image.load('R9.png')]
-walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.image.load('L3.png'), pygame.image.load('L4.png'), pygame.image.load('L5.png'), pygame.image.load('L6.png'), pygame.image.load('L7.png'), pygame.image.load('L8.png'), pygame.image.load('L9.png')]
-bg = pygame.image.load('C:\\Users\\mchugh_kevin\\Desktop\\python4\\pygame\\images\\drawing3.jpg')
-char = pygame.image.load('standing.png')
-
-x = 50
-y = 400
-width = 40
-height = 60
-vel = 5
+RED = (255,0,0)
 
 clock = pygame.time.Clock()
 
-isJump = False
-jumpCount = 10
+mixer.init()
+mixer.music.load('C:\\Users\\mchugh_kevin\\Desktop\\pygame\\images\\sounds\\Lofi Hip Hop.mp3')
+mixer.music.play()
+mixer.music.set_volume(0.05)
 
-left = False
-right = False
-walkCount = 0
+walkRight = [getImage(dir_img+'R1.png'), getImage(dir_img+'R2.png'), getImage(dir_img+'R3.png'), getImage(dir_img+'R4.png'), getImage(dir_img+'R5.png'), getImage(dir_img+'R6.png'), getImage(dir_img+'R7.png'), getImage(dir_img+'R8.png'), getImage(dir_img+'R9.png')]
+walkLeft = [getImage(dir_img+'L1.png'), getImage(dir_img+'L2.png'), getImage(dir_img+'L3.png'), getImage(dir_img+'L4.png'), getImage(dir_img+'L5.png'), getImage(dir_img+'L6.png'), getImage(dir_img+'L7.png'), getImage(dir_img+'L8.png'), getImage(dir_img+'L9.png')]
+bg = getImage(dir_img+'drawing3.jpg')
+char = getImage(dir_img+'standing.png')
+
+clock = pygame.time.Clock()
+
+hitSound = pygame.mixer.Sound('C:\\Users\\mchugh_kevin\\Desktop\\pygame\\images\\sounds\\Game_hit.mp3')
+
+score = 0
+
+class player(object):
+    def __init__(self,x,y,width,height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.vel = 5
+        self.isJump = False
+        self.left = False
+        self.right = False
+        self.walkCount = 0
+        self.jumpCount = 10
+        self.standing = True
+        self.hitbox = (self.x + 17, self.y + 11, 29, 52)
+
+    def draw(self, win):
+        if self.walkCount + 1 >= 27:
+            self.walkCount = 0
+
+        if not(self.standing):
+            if self.left:
+                win.blit(walkLeft[self.walkCount//3], (self.x,self.y))
+                self.walkCount += 1
+            elif self.right:
+                win.blit(walkRight[self.walkCount//3], (self.x,self.y))
+                self.walkCount +=1
+        else:
+            if self.right:
+                win.blit(walkRight[0], (self.x, self.y))
+            else:
+                win.blit(walkLeft[0], (self.x, self.y))
+        self.hitbox = (self.x + 17, self.y + 11, 29, 52)
+        #pygame.draw.rect(win, (255,0,0), self.hitbox,2)
+
+    def hit(self):
+        self.isJump = False
+        self.jumpCount = 10
+        self.x -= 100
+        self.walkCount = 0
+        font1 = pygame.font.SysFont('comicsans', 100)
+        text = font1.render('-5', 1, (255,0,0))
+        Screen.blit(text, (250 - (text.get_width()/2),200))
+        pygame.display.update()
+        i = 0
+        while i < 200:
+            pygame.time.delay(10)
+            i += 1
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    i = 201
+                    pygame.quit()
+                
+class projectile(object):
+    def __init__(self,x,y,radius,color,facing):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+        self.facing = facing
+        self.vel = 8 * facing
+
+    def draw(self,win):
+        pygame.draw.circle(win, self.color, (self.x,self.y), self.radius)
+
+class enemy(object):
+    walkRight = [getImage(dir_img+'R1E.png'), getImage(dir_img+'R2E.png'), getImage(dir_img+'R3E.png'), getImage(dir_img+'R4E.png'), getImage(dir_img+'R5E.png'), getImage(dir_img+'R6E.png'), getImage(dir_img+'R7E.png'), getImage(dir_img+'R8E.png'), getImage(dir_img+'R9E.png'), getImage(dir_img+'R10E.png'), getImage(dir_img+'R11E.png')]
+    walkLeft =  [getImage(dir_img+'L1E.png'), getImage(dir_img+'L2E.png'), getImage(dir_img+'L3E.png'), getImage(dir_img+'L4E.png'), getImage(dir_img+'L5E.png'), getImage(dir_img+'L6E.png'), getImage(dir_img+'L7E.png'), getImage(dir_img+'L8E.png'), getImage(dir_img+'L9E.png'), getImage(dir_img+'L10E.png'), getImage(dir_img+'L11E.png')]
+
+    def __init__(self, x, y, width, height, end):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.end = end
+        self.path = [self.x, self.end]
+        self.walkCount = 0
+        self.vel = 3
+        self.hitbox = (self.x + 17, self.y + 2, 31, 57)
+        self.health = 20
+        self.visible = True
+
+    def draw(self,win):
+        self.move()
+        if self.visible:
+            if self.walkCount + 1 >= 33:
+                self.walkCount = 0
+
+            if self.vel > 0:
+                win.blit(self.walkRight[self.walkCount //3], (self.x, self.y))
+                self.walkCount += 1
+            else:
+                win.blit(self.walkLeft[self.walkCount //3], (self.x, self.y))
+                self.walkCount += 1
+
+            pygame.draw.rect(win, (255,0,0), (self.hitbox[0], self.hitbox[1] - 20, 50, 10))
+            pygame.draw.rect(win, (0,128,0), (self.hitbox[0], self.hitbox[1] - 20, 50 - (5 * (10 - self.health)), 10))
+            self.hitbox = (self.x + 17, self.y + 2, 31, 57)
+            #pygame.draw.rect(win, (255,0,0), self.hitbox,2)
+
+    def move(self):
+        if self.vel > 0:
+            if self.x + self.vel < self.path[1]:
+                self.x += self.vel
+            else:
+                self.vel = self.vel * -1
+                self.walkCount = 0
+        else:
+            if self.x - self.vel > self.path[0]:
+                self.x += self.vel
+            else:
+                self.vel = self.vel * -1
+                self.walkCount = 0
+
+    def hit(self,damage = 1):
+        if self.health > 0:
+            self.health -= damage
+        else:
+            self.visible = False
+        print('hit')
 
 def redrawGameWindow():
-    global walkCount
+    Screen.blit(bg, (0,0))
+    text = font.render('Score: ' + str(score), 1, (0,0,0))
+    Screen.blit(text, (350, 10))
+    man.draw(Screen)
+    goblin.draw(Screen)
+    for bullet in bullets:
+        bullet.draw(Screen)
     
-    win.blit(bg, (0,0))  
-    if walkCount + 1 >= 27:
-        walkCount = 0
-        
-    if left:  
-        win.blit(walkLeft[walkCount//3], (x,y))
-        walkCount += 1                          
-    elif right:
-        win.blit(walkRight[walkCount//3], (x,y))
-        walkCount += 1
-    else:
-        win.blit(char, (x, y))
-        walkCount = 0
-        
-    pygame.display.update() 
-    
+    pygame.display.update()
 
-
+font = pygame.font.SysFont('comicsans', 30, True)
+man = player(x=200, y=510, width=24,height=24)
+goblin = enemy(x=100, y=510, width=24, height=24,end=450)
+shootLoop = 0
+bullets = []
 run = True
 
 while run:
     clock.tick(27)
 
+    if goblin.visible == True:
+        if man.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and man.hitbox[1] + man.hitbox[3] > goblin.hitbox[1]:
+            if man.hitbox[0] + man.hitbox[2] > goblin.hitbox[0] and man.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
+                man.hit()
+                score -= 5
+    
+    if shootLoop > 0:
+        shootLoop += 1
+    if shootLoop > 3:
+        shootLoop = 0
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        
+    for bullet in bullets:
+        if bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
+            if bullet.x + bullet.radius > goblin.hitbox[0] and bullet.x - bullet.radius < goblin.hitbox[0] + goblin.hitbox[2]:
+                hitSound.play()
+                goblin.hit()
+                score += 1
+                bullets.pop(bullets.index(bullet))
+                
+        if bullet.x < 500 and bullet.x > 0:
+            bullet.x += bullet.vel
+        else:
+            bullets.pop(bullets.index(bullet))
 
     keys = pygame.key.get_pressed()
-    
-    if keys[pygame.K_LEFT] and x > vel: 
-        x -= vel
-        left = True
-        right = False
 
-    elif keys[pygame.K_RIGHT] and x < 500 - vel - width:  
-        x += vel
-        left = False
-        right = True
-        
-    else: 
-        left = False
-        right = False
-        walkCount = 0
-        
-    if not(isJump):
-        if keys[pygame.K_SPACE]:
-            isJump = True
-            left = False
-            right = False
-            walkCount = 0
+    if keys[pygame.K_SPACE] and shootLoop == 0:
+        if man.left:
+            facing = -1
+        else:
+            facing = 1
+            
+        if len(bullets) < 5:
+            bullets.append(projectile(round(man.x + man.width //2), round(man.y + man.height//2), 6, (0,0,0), facing))
+
+        shootLoop = 1
+
+    if keys[pygame.K_a] and man.x > man.vel:
+        man.x -= man.vel
+        man.left = True
+        man.right = False
+        man.standing = False
+    elif keys[pygame.K_d] and man.x < 500 - man.width - man.vel:
+        man.x += man.vel
+        man.right = True
+        man.left = False
+        man.standing = False
     else:
-        if jumpCount >= -10:
-            y -= (jumpCount * abs(jumpCount)) * 0.5
-            jumpCount -= 1
-        else: 
-            jumpCount = 10
-            isJump = False
-
-    redrawGameWindow() 
-
-'''
-Spawning more enimes
-'''
-def moveEnemy(self):
-    enemy = ["enemies", "enemies_list"]
-    lists = ["all_sprites_list"]
-
-    Enemy.rect.x = player.rect.x
-    Enemy.rect.y = player.rect.y
-    lists[0].add(enemy[0])
-    enemy[1].add(enemy[0])
-
-class Enemy(object):
-    ...
-    def move_towards_player(self, player):
-        # Find direction vector (dx, dy) between enemy and player.
-        dx, dy = player.rect.x - self.rect.x, player.rect.y - self.rect.y
-        dist = math.hypot(dx, dy)
-        dx, dy = dx / dist, dy / dist  # Normalize.
-        # Move along this normalized vector towards the player at current speed.
-        self.rect.x += dx * self.speed
-        self.rect.y += dy * self.speed
-
-    # Same thing using only pygame utilities
-    def move_towards_player2(self, player):
-        # Find direction vector (dx, dy) between enemy and player.
-        dirvect = pygame.math.Vector2(player.rect.x - self.rect.x,
-                                      player.rect.y - self.rect.y)
-        dirvect.normalize()
-        # Move along this normalized vector towards the player at current speed.
-        dirvect.scale_to_length(self.speed)
-        self.rect.move_ip(dirvect)
-
-
-'''
-Score
-'''
-# Sound
-mixer.music.load("background.wav")
-mixer.music.play(-1)
-
-# Caption and Icon
-pygame.display.set_caption("Space Invader")
-icon = pygame.image.load('ufo.png')
-pygame.display.set_icon(icon)
-
-# Player
-playerImg = pygame.image.load('player.png')
-playerX = 370
-playerY = 480
-playerX_change = 0
-
-# Enemy
-enemyImg = []
-enemyX = []
-enemyY = []
-enemyX_change = []
-enemyY_change = []
-num_of_enemies = 6
-
-for i in range(num_of_enemies):
-    enemyImg.append(pygame.image.load('enemy.png'))
-    enemyX.append(random.randint(0, 736))
-    enemyY.append(random.randint(50, 150))
-    enemyX_change.append(4)
-    enemyY_change.append(40)
-
-bulletImg = pygame.image.load('bullet.png')
-bulletX = 0
-bulletY = 480
-bulletX_change = 0
-bulletY_change = 10
-bullet_state = "ready"
-
-# Score
-
-score_value = 0
-font = pygame.font.Font('freesansbold.ttf', 32)
-
-textX = 10
-testY = 10
-
-# Game Over
-over_font = pygame.font.Font('freesansbold.ttf', 64)
-
-
-def show_score(x, y):
-    score = font.render("Score : " + str(score_value), True, (255, 255, 255))
-    screen.blit(score, (x, y))
-
-
-def game_over_text():
-    over_text = over_font.render("GAME OVER", True, (255, 255, 255))
-    screen.blit(over_text, (200, 250))
-
-
-def player(x, y):
-    screen.blit(playerImg, (x, y))
-
-
-def enemy(x, y, i):
-    screen.blit(enemyImg[i], (x, y))
-
-
-def fire_bullet(x, y):
-    global bullet_state
-    bullet_state = "fire"
-    screen.blit(bulletImg, (x + 16, y + 10))
-
-
-def isCollision(enemyX, enemyY, bulletX, bulletY):
-    distance = math.sqrt(math.pow(enemyX - bulletX, 2) + (math.pow(enemyY - bulletY, 2)))
-    if distance < 27:
-        return True
+        man.standing = True
+        man.walkCount = 0
+        
+    if not(man.isJump):
+        if keys[pygame.K_w]:
+            man.isJump = True
+            man.right = False
+            man.left = False
+            man.walkCount = 0
     else:
-        return False
-
-
-# Game Loop
-running = True
-while running:
-
-    # RGB = Red, Green, Blue
-    screen.fill((0, 0, 0))
-    # Background Image
-    screen.blit(background, (0, 0))
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-        # if keystroke is pressed check whether its right or left
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                playerX_change = -5
-            if event.key == pygame.K_RIGHT:
-                playerX_change = 5
-            if event.key == pygame.K_SPACE:
-                if bullet_state is "ready":
-                    bulletSound = mixer.Sound("laser.wav")
-                    bulletSound.play()
-                    # Get the current x cordinate of the spaceship
-                    bulletX = playerX
-                    fire_bullet(bulletX, bulletY)
-
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                playerX_change = 0
-
-    # 5 = 5 + -0.1 -> 5 = 5 - 0.1
-    # 5 = 5 + 0.1
-
-    playerX += playerX_change
-    if playerX <= 0:
-        playerX = 0
-    elif playerX >= 736:
-        playerX = 736
-
-    # Enemy Movement
-    for i in range(num_of_enemies):
-
-        # Game Over
-        if enemyY[i] > 440:
-            for j in range(num_of_enemies):
-                enemyY[j] = 2000
-            game_over_text()
-            break
-
-        enemyX[i] += enemyX_change[i]
-        if enemyX[i] <= 0:
-            enemyX_change[i] = 4
-            enemyY[i] += enemyY_change[i]
-        elif enemyX[i] >= 736:
-            enemyX_change[i] = -4
-            enemyY[i] += enemyY_change[i]
-
-        # Collision
-        collision = isCollision(enemyX[i], enemyY[i], bulletX, bulletY)
-        if collision:
-            explosionSound = mixer.Sound("explosion.wav")
-            explosionSound.play()
-            bulletY = 480
-            bullet_state = "ready"
-            score_value += 1
-            enemyX[i] = random.randint(0, 736)
-            enemyY[i] = random.randint(50, 150)
-
-        enemy(enemyX[i], enemyY[i], i)
-
-    # Bullet Movement
-    if bulletY <= 0:
-        bulletY = 480
-        bullet_state = "ready"
-
-    if bullet_state is "fire":
-        fire_bullet(bulletX, bulletY)
-        bulletY -= bulletY_change
-
-    player(playerX, playerY)
-    show_score(textX, testY)
-    pygame.display.update()
-
-
-
-'''
-Main Loop
-'''
-
-while main:
-    player = player
-    steps = steps
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            try:
-                sys.exit()
-            finally:
-                main = False
-
-        if event.type == pygame.KEYDOWN:
-            if event.key == ord('q'):
-                pygame.quit()
-                try:
-                    sys.exit()
-                finally:
-                    main = False
-            if event.key == pygame.K_LEFT or event.key == ord('a'):
-                player.control(-steps, 0)
-            if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                player.control(steps, 0)
-            if event.key == pygame.K_UP or event.key == ord('w'):
-                print('jump')
-
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT or event.key == ord('a'):
-                player.control(steps, 0)
-            if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                player.control(-steps, 0)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            try:
-                sys.exit()
-            finally:
-                main = False
-
-        if event.type == pygame.KEYDOWN:
-            if event.key == ord('q'):
-                pygame.quit()
-                try:
-                    sys.exit()
-                finally:
-                    main = False
-            if event.key == pygame.K_LEFT or event.key == ord('a'):
-                player.control(-steps, 0)
-            if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                player.control(steps, 0)
-            if event.key == pygame.K_UP or event.key == ord('w'):
-                print('jump')
-
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT or event.key == ord('a'):
-                player.control(steps, 0)
-            if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                player.control(-steps, 0)
-
-    world.blit(backdrop, backdropbox)
-    player.update()
-    player_list.draw(world)
-    enemy_list.draw(world)
-    for e in enemy_list:
-        e.move()
-    pygame.display.flip()
-    clock.tick(fps)
+        if man.jumpCount >= -10:
+            neg = 1
+            if man.jumpCount < 0:
+                neg = -1
+            man.y -= (man.jumpCount ** 2) * 0.5 * neg
+            man.jumpCount -= 1
+        else:
+            man.isJump = False
+            man.jumpCount = 10
+            
+    redrawGameWindow()
 
 pygame.quit()

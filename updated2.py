@@ -56,6 +56,7 @@ class Player(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
 
     def control(self, x, y):
+        
         """
         control player movement
         """
